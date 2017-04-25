@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Shop</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+              integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                     <div class="page-header">
+                        <h1>My Shop</h1>
+                    </div>
+                </div>
+            </div>
+            <div id="registration" class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <div class="col-md-6">
+                        <h2>Account Registration</h2>
+                        <p>Please input your phone number below and we will send you an OTP</p>
+                        <form action="process.php" method="POST">
+                            <div class="form-group input-group">
+                                <span class="input-group-addon">+65</span><input type="text" class="form-control" name="phone" placeholder="Phone Number" />
+                            </div>
+                            <div class="form-group input-group">
+                                <input class="btn btn-default" type="submit" value="Next" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div id="login" class="row" style="display: none;">
+                <div class="col-md-6 col-md-offset-3">
+                    <div class="col-md-6">
+                        <h2>Account Registration</h2>
+                        <p>A one-time OTP has been sent to your mobile number: <span id="otp-phone"></span></p>
+                        <form action="process.php" method="POST">
+                            <div class="form-group input-group">
+                                <input type="text" class="form-control" name="otp" placeholder="OTP" />
+                            </div>
+                            <div class="form-group input-group">
+                                <input class="btn btn-default" type="submit" value="Next" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+            $(document).ready(function() {
+               $('#registration form').submit(function(event){
+                   var formData = {
+                        'phone': $('input[name=phone]').val(),
+                        'req': 'register'
+                   };
+                    
+                   $.ajax({
+                      type: 'POST',
+                      url: 'process.php',
+                      data: formData,
+                      dataType: 'json'
+                   }).done(function(data){
+                       console.log(data);
+                       if(data.error)
+                       {
+                            $('#registration form').prepend('<div class="alert alert-danger">' + data.error + '</div>')
+                       }
+                       else
+                       {
+                           $('#registration').hide();
+                           $('#login #otp-phone').text(data.phone);
+                           $('#login').show();
+                       }
+                   });
+               
+                   event.preventDefault();
+               });
+               
+               $('#login form').submit(function(event){
+                   var formData = {
+                        'phone': $('input[name=phone]').val(),
+                        'otp': $('input[name=otp]').val(),
+                        'req': 'login'
+                   };
+                    
+                   $.ajax({
+                      type: 'POST',
+                      url: 'process.php',
+                      data: formData,
+                      dataType: 'json'
+                   }).done(function(data){
+                       console.log(data);
+                       if(data.error)
+                       {
+                            $('#login form').prepend('<div class="alert alert-danger">' + data.error + '</div>')
+                       }
+                       else
+                       {
+                           if(data.sign_up_url)
+                           {
+                               window.location.href = data.sign_up_url;
+                           }
+                           else
+                           {
+                               window.location.href = 'shop.php';
+                           }
+                       }
+                   });
+               
+                   event.preventDefault();
+               });
+            });
+        </script>
+    </body>
+</html>
